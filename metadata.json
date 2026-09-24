@@ -1,0 +1,6 @@
+{
+  "name": "Wander & Talk — Travel Journal & Podcast",
+  "description": "An editorial travel journal and immersive podcast web application exploring hidden corners, vibrant cultures, and desert horizons.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
