@@ -39,6 +39,45 @@ export const DESTINATIONS: Destination[] = [
     ],
     relatedEpisodeIds: [
       'ep-03'
+    ],
+    mapMarkers: [
+      {
+        id: 'poi-dxb-1',
+        name: 'Old Dubai Creek & Dhow Wharves',
+        description: 'Vibrant spice souks and traditional wooden abra boats crossing the saltwater inlet.',
+        category: 'Audio Spot',
+        lat: 25.2669,
+        lng: 55.2974,
+        blogSlug: 'old-dubai-creek-street-food-guide',
+        episodeId: 'ep-03'
+      },
+      {
+        id: 'poi-dxb-2',
+        name: 'Al Fahidi Historical Quarter',
+        description: '19th-century gypsum and coral wind-tower houses housing tea houses and galleries.',
+        category: 'History',
+        lat: 25.2638,
+        lng: 55.2995,
+        blogSlug: 'old-dubai-creek-street-food-guide'
+      },
+      {
+        id: 'poi-dxb-3',
+        name: 'Al Qudra Desert Lakes',
+        description: 'Quiet sand dunes and migratory bird sanctuaries at sunset.',
+        category: 'Nature',
+        lat: 24.8360,
+        lng: 55.3670,
+        blogSlug: 'essential-solo-student-travel-tips'
+      },
+      {
+        id: 'poi-dxb-4',
+        name: 'Al Karama Street Food Corridor',
+        description: 'Hidden gem tea stalls and clay-oven tandoori cafeterias.',
+        category: 'Food',
+        lat: 25.2415,
+        lng: 55.3056,
+        blogSlug: 'old-dubai-creek-street-food-guide'
+      }
     ]
   },
   {
@@ -78,6 +117,35 @@ export const DESTINATIONS: Destination[] = [
     ],
     relatedEpisodeIds: [
       'ep-01'
+    ],
+    mapMarkers: [
+      {
+        id: 'poi-shj-1',
+        name: 'Mleiha Desert Dunes & Fossil Rock',
+        description: 'Sweeping ochre desert dunes with Bronze Age tombs and eerie acoustic silence.',
+        category: 'Audio Spot',
+        lat: 25.1488,
+        lng: 55.8569,
+        blogSlug: 'sunrise-sharjah-desert-mleiha-guide',
+        episodeId: 'ep-01'
+      },
+      {
+        id: 'poi-shj-2',
+        name: 'Heart of Sharjah Heritage Quarter',
+        description: 'Restored coral-stone windtower alleyways and artist residencies.',
+        category: 'History',
+        lat: 25.3582,
+        lng: 55.3857,
+        blogSlug: 'sunrise-sharjah-desert-mleiha-guide'
+      },
+      {
+        id: 'poi-shj-3',
+        name: 'Souq Al Jubail Waterfront Fish & Fruit Market',
+        description: 'Grand domed architecture with lively fish auctions and freshly ground spice stalls.',
+        category: 'Food',
+        lat: 25.3524,
+        lng: 55.3831
+      }
     ]
   },
   {
@@ -117,6 +185,36 @@ export const DESTINATIONS: Destination[] = [
     ],
     relatedEpisodeIds: [
       'ep-04'
+    ],
+    mapMarkers: [
+      {
+        id: 'poi-auh-1',
+        name: 'Jubail Mangrove Park Boardwalk',
+        description: 'Tidal saltwater estuaries with herons, flamingos, and tranquil floating walkways.',
+        category: 'Nature',
+        lat: 24.5458,
+        lng: 54.4842,
+        blogSlug: 'quiet-corners-abu-dhabi-mangroves-louvre',
+        episodeId: 'ep-04'
+      },
+      {
+        id: 'poi-auh-2',
+        name: 'Louvre Abu Dhabi "Rain of Light"',
+        description: 'Jean Nouvel dome floating over seawater galleries with quiet contemplative courts.',
+        category: 'Sight',
+        lat: 24.5337,
+        lng: 54.3982,
+        blogSlug: 'quiet-corners-abu-dhabi-mangroves-louvre'
+      },
+      {
+        id: 'poi-auh-3',
+        name: 'Al Quaa Dark Sky Sanctuary',
+        description: 'Remote desert bowl offering Bortle Class 2 stargazing under the Milky Way core.',
+        category: 'Audio Spot',
+        lat: 23.5932,
+        lng: 54.7643,
+        episodeId: 'ep-04'
+      }
     ]
   },
   {
@@ -156,6 +254,35 @@ export const DESTINATIONS: Destination[] = [
     ],
     relatedEpisodeIds: [
       'ep-02'
+    ],
+    mapMarkers: [
+      {
+        id: 'poi-hat-1',
+        name: 'Hatta Dam Emerald Reservoir',
+        description: 'Turquoise reservoir enclosed between jagged Hajar rock walls.',
+        category: 'Audio Spot',
+        lat: 24.7845,
+        lng: 56.1186,
+        blogSlug: 'hatta-mountain-weekend-escape-guide',
+        episodeId: 'ep-02'
+      },
+      {
+        id: 'poi-hat-2',
+        name: 'Hatta Heritage Village & Watchtowers',
+        description: 'Restored mountain defensive fort and palm-frond barasti homes.',
+        category: 'History',
+        lat: 24.8197,
+        lng: 56.1289,
+        blogSlug: 'hatta-mountain-weekend-escape-guide'
+      },
+      {
+        id: 'poi-hat-3',
+        name: 'Hatta Honeybee Discovery Garden',
+        description: 'Native Samar tree apiaries producing wild mountain acacia honey.',
+        category: 'Nature',
+        lat: 24.8073,
+        lng: 56.1384
+      }
     ]
   },
   {
@@ -195,6 +322,27 @@ export const DESTINATIONS: Destination[] = [
     ],
     relatedEpisodeIds: [
       'ep-05'
+    ],
+    mapMarkers: [
+      {
+        id: 'poi-mct-1',
+        name: 'Muttrah Corniche & Frankincense Souq',
+        description: 'Labyrinthine timber-roof alleys scented with silver hojari frankincense and myrrh.',
+        category: 'Audio Spot',
+        lat: 23.6265,
+        lng: 58.5638,
+        blogSlug: 'muscat-oman-coastal-roadtrip-journal',
+        episodeId: 'ep-05'
+      },
+      {
+        id: 'poi-mct-2',
+        name: 'Wadi Shab Gorge Hike & Cave Waterfall',
+        description: 'Aquamarine freshwater pools leading to a hidden swim-in cavern.',
+        category: 'Nature',
+        lat: 22.8385,
+        lng: 59.2452,
+        blogSlug: 'muscat-oman-coastal-roadtrip-journal'
+      }
     ]
   },
   {
@@ -232,6 +380,34 @@ export const DESTINATIONS: Destination[] = [
     relatedBlogSlugs: [
       'cappadocia-dawn-balloons-budget-guide'
     ],
-    relatedEpisodeIds: []
+    relatedEpisodeIds: [],
+    mapMarkers: [
+      {
+        id: 'poi-cap-1',
+        name: 'Love Valley Sunrise Ridge',
+        description: 'Spectacular dawn viewpoint where hot air balloons float over fairy chimneys.',
+        category: 'Sight',
+        lat: 38.6620,
+        lng: 34.8290,
+        blogSlug: 'cappadocia-dawn-balloons-budget-guide'
+      },
+      {
+        id: 'poi-cap-2',
+        name: 'Göreme Open Air Museum',
+        description: 'Rock-hewn churches with preserved 10th-century Byzantine religious frescoes.',
+        category: 'History',
+        lat: 38.6402,
+        lng: 34.8453,
+        blogSlug: 'cappadocia-dawn-balloons-budget-guide'
+      },
+      {
+        id: 'poi-cap-3',
+        name: 'Derinkuyu Underground City',
+        description: '8-story subterranean refuge with ventilation shafts and stone rolling doors.',
+        category: 'History',
+        lat: 38.3736,
+        lng: 34.7347
+      }
+    ]
   }
 ];

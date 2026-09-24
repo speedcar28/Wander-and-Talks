@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Mail, CheckCircle2, ArrowRight, Sparkles } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export const NewsletterSection: React.FC = () => {
+  const { subscribeNewsletter, newsletterEmail } = useAuth();
   const [email, setEmail] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted, setSubmitted] = useState(!!newsletterEmail);
   const [error, setError] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -13,6 +15,7 @@ export const NewsletterSection: React.FC = () => {
       return;
     }
     setError('');
+    subscribeNewsletter(email);
     setSubmitted(true);
   };
 

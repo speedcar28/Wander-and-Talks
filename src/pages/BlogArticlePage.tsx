@@ -1,24 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   ArrowLeft,
   Clock,
-  Calendar,
   MapPin,
   Share2,
   Bookmark,
   Check,
   Headphones,
   Compass,
-  Volume2,
   Navigation,
   ExternalLink,
   Play,
-  Pause
+  Pause,
+  Radio,
+  Sparkles
 } from 'lucide-react';
 import { BLOG_ARTICLES } from '../data/blogs';
 import { PODCAST_EPISODES } from '../data/podcasts';
 import { BlogCard } from '../components/BlogCard';
+import { EpisodeCard } from '../components/EpisodeCard';
 import { useAudio } from '../context/AudioContext';
+import { useAuth } from '../context/AuthContext';
 
 interface BlogArticlePageProps {
   slug: string;
@@ -27,17 +29,55 @@ interface BlogArticlePageProps {
 
 export const BlogArticlePage: React.FC<BlogArticlePageProps> = ({ slug, onNavigate }) => {
   const { currentEpisode, isPlaying, playEpisode, togglePlay } = useAudio();
+  const { isFavorite, toggleFavorite } = useAuth();
+  
   const [copied, setCopied] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const [readingProgress, setReadingProgress] = useState(0);
 
   const article = BLOG_ARTICLES.find((a) => a.slug === slug) || BLOG_ARTICLES[0];
   const relatedArticles = BLOG_ARTICLES.filter((a) => a.id !== article.id).slice(0, 3);
-  const relatedPodcast = article.relatedPodcastId
-    ? PODCAST_EPISODES.find((ep) => ep.id === article.relatedPodcastId)
-    : null;
+  
+  const isSaved = isFavorite(article.slug);
 
-  const isThisEpisodeActive = relatedPodcast && currentEpisode?.id === relatedPodcast.id;
-  const isThisEpisodePlaying = isThisEpisodeActive && isPlaying;
+  // Subtle reading progress calculation
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (scrollableHeight > 0) {
+        const currentProgress = (window.scrollY / scrollableHeight) * 100;
+        setReadingProgress(Math.min(100, Math.max(0, currentProgress)));
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [slug]);
+
+  // Dynamically filter related podcast episodes based on article's tags, direct id, and location
+  const matchedPodcasts = useMemo(() => {
+    const directMatch = article.relatedPodcastId
+      ? PODCAST_EPISODES.filter((ep) => ep.id === article.relatedPodcastId)
+      : [];
+
+    const tagAndLocationMatches = PODCAST_EPISODES.filter((ep) => {
+      if (directMatch.some((d) => d.id === ep.id)) return false;
+      const hasCommonTag = ep.tags.some((t) => article.tags.includes(t));
+      const hasLocationOverlap =
+        ep.locationName.toLowerCase().includes(article.location.city.toLowerCase()) ||
+        ep.locationName.toLowerCase().includes(article.location.country.toLowerCase()) ||
+        article.location.city.toLowerCase().includes(ep.locationName.toLowerCase());
+      return hasCommonTag || hasLocationOverlap;
+    });
+
+    return [...directMatch, ...tagAndLocationMatches];
+  }, [article]);
+
+  const primaryRelatedPodcast = matchedPodcasts.length > 0 ? matchedPodcasts[0] : null;
+  const otherRelatedPodcasts = matchedPodcasts.slice(1);
+
+  const isPrimaryActive = primaryRelatedPodcast && currentEpisode?.id === primaryRelatedPodcast.id;
+  const isPrimaryPlaying = isPrimaryActive && isPlaying;
 
   const handleShare = () => {
     if (navigator.clipboard) {
@@ -47,47 +87,62 @@ export const BlogArticlePage: React.FC<BlogArticlePageProps> = ({ slug, onNaviga
     }
   };
 
-  const handlePlayRelatedPodcast = () => {
-    if (!relatedPodcast) return;
-    if (isThisEpisodeActive) {
+  const handlePlayPrimaryPodcast = () => {
+    if (!primaryRelatedPodcast) return;
+    if (isPrimaryActive) {
       togglePlay();
     } else {
-      playEpisode(relatedPodcast, true);
+      playEpisode(primaryRelatedPodcast, true);
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12 pb-24">
+    <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12 pb-24">
       
+      {/* Fixed Reading Progress Bar at Top */}
+      <div 
+        className="fixed top-0 left-0 right-0 z-50 h-1 bg-transparent pointer-events-none"
+        aria-hidden="true"
+      >
+        <div 
+          className="h-full bg-gradient-to-r from-[#2B6E70] via-[#E06D3B] to-[#F59E0B] transition-all duration-100 ease-out shadow-xs"
+          style={{ width: `${readingProgress}%` }}
+        />
+      </div>
+
       {/* Back Navigation Bar */}
       <div className="flex items-center justify-between border-b border-[#EAE3D2] dark:border-[#223347] pb-4">
         <button
           onClick={() => onNavigate('blog')}
-          className="inline-flex items-center gap-2 text-xs font-semibold text-[#4A5E78] dark:text-[#94A9C4] hover:text-[#0F1B2B] dark:hover:text-white transition-colors"
+          className="inline-flex items-center gap-2 text-xs font-semibold text-[#4A5E78] dark:text-[#94A9C4] hover:text-[#0F1B2B] dark:hover:text-white transition-colors cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to All Articles</span>
         </button>
 
         <div className="flex items-center gap-2">
+          <span className="text-[11px] font-mono text-[#6B85A6] hidden sm:inline mr-1">
+            {Math.round(readingProgress)}% read
+          </span>
+
           <button
-            onClick={() => setSaved(!saved)}
-            aria-label="Save for later"
-            title={saved ? "Saved to reading list" : "Save article"}
-            className={`p-2 rounded-lg border transition-colors ${
-              saved
+            onClick={() => toggleFavorite(article.slug)}
+            aria-label={isSaved ? "Saved to reading list" : "Save article"}
+            title={isSaved ? "Saved to reading list" : "Save article"}
+            className={`p-2 rounded-lg border transition-colors cursor-pointer ${
+              isSaved
                 ? 'bg-[#E06D3B]/10 border-[#E06D3B] text-[#E06D3B]'
                 : 'border-[#EAE3D2] dark:border-[#223347] text-[#6B85A6] hover:text-[#0F1B2B] dark:hover:text-white'
             }`}
           >
-            <Bookmark className={`w-4 h-4 ${saved ? 'fill-current' : ''}`} />
+            <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
           </button>
 
           <button
             onClick={handleShare}
             aria-label="Share article link"
             title={copied ? "Link copied!" : "Share article"}
-            className="p-2 rounded-lg border border-[#EAE3D2] dark:border-[#223347] text-[#6B85A6] hover:text-[#0F1B2B] dark:hover:text-white transition-colors"
+            className="p-2 rounded-lg border border-[#EAE3D2] dark:border-[#223347] text-[#6B85A6] hover:text-[#0F1B2B] dark:hover:text-white transition-colors cursor-pointer"
           >
             {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Share2 className="w-4 h-4" />}
           </button>
@@ -205,7 +260,7 @@ export const BlogArticlePage: React.FC<BlogArticlePageProps> = ({ slug, onNaviga
           </div>
         ))}
 
-        {/* Interactive Map / Coordinates Placeholder Box */}
+        {/* Interactive Coordinates / GPS Map Box */}
         <div className="my-10 p-6 rounded-2xl bg-[#F4EFE6] dark:bg-[#142030] border border-[#EAE3D2] dark:border-[#223347] space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -274,34 +329,43 @@ export const BlogArticlePage: React.FC<BlogArticlePageProps> = ({ slug, onNaviga
 
       </div>
 
-      {/* "Listen to the Related Podcast Episode" Card */}
-      {relatedPodcast && (
-        <section className="rounded-2xl bg-gradient-to-r from-[#0F1B2B] to-[#18283E] text-white p-6 sm:p-8 border border-[#243954] shadow-xl space-y-4">
-          <div className="flex items-center gap-2 text-xs font-mono text-[#E9865A] uppercase tracking-wider">
-            <Headphones className="w-4 h-4 text-[#E06D3B]" />
-            <span>COMPANION AUDIO EPISODE</span>
+      {/* Dynamically Filtered Related Podcast Section */}
+      {primaryRelatedPodcast && (
+        <section className="rounded-2xl bg-gradient-to-r from-[#0F1B2B] via-[#142030] to-[#18283E] text-white p-6 sm:p-8 border border-[#243954] shadow-xl space-y-6">
+          <div className="flex items-center justify-between border-b border-white/10 pb-3">
+            <div className="flex items-center gap-2 text-xs font-mono text-[#E9865A] uppercase tracking-wider font-semibold">
+              <Headphones className="w-4 h-4 text-[#E06D3B]" />
+              <span>TAG-MATCHED COMPANION AUDIO</span>
+            </div>
+            <span className="text-[11px] font-mono text-[#94A9C4]">
+              Ep. 0{primaryRelatedPodcast.episodeNumber}
+            </span>
           </div>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
             <div className="space-y-2 flex-1">
               <h3 className="font-serif text-2xl font-bold text-white leading-tight">
-                {relatedPodcast.title}
+                {primaryRelatedPodcast.title}
               </h3>
               <p className="text-sm text-[#B8C8DB] line-clamp-2 leading-relaxed">
-                {relatedPodcast.description}
+                {primaryRelatedPodcast.description}
               </p>
-              <div className="flex items-center gap-3 text-xs text-[#94A9C4] font-mono pt-1">
-                <span>Duration: {relatedPodcast.duration}</span>
+              <div className="flex flex-wrap items-center gap-3 text-xs text-[#94A9C4] font-mono pt-1">
+                <span>Duration: {primaryRelatedPodcast.duration}</span>
                 <span>·</span>
-                <span>Recorded on location in {relatedPodcast.locationName}</span>
+                <span>Recorded in {primaryRelatedPodcast.locationName}</span>
+                <span>·</span>
+                <span className="text-[#E9865A]">
+                  Tags: {primaryRelatedPodcast.tags.slice(0, 3).join(', ')}
+                </span>
               </div>
             </div>
 
             <button
-              onClick={handlePlayRelatedPodcast}
-              className="px-6 py-3.5 rounded-xl bg-[#E06D3B] hover:bg-[#C75525] text-white font-semibold text-sm flex items-center gap-3 transition-all shrink-0 shadow-md active:scale-95"
+              onClick={handlePlayPrimaryPodcast}
+              className="px-6 py-3.5 rounded-xl bg-[#E06D3B] hover:bg-[#C75525] text-white font-semibold text-sm flex items-center gap-3 transition-all shrink-0 shadow-md active:scale-95 cursor-pointer"
             >
-              {isThisEpisodePlaying ? (
+              {isPrimaryPlaying ? (
                 <>
                   <Pause className="w-5 h-5 fill-current" />
                   <span>Pause Episode</span>
@@ -314,6 +378,35 @@ export const BlogArticlePage: React.FC<BlogArticlePageProps> = ({ slug, onNaviga
               )}
             </button>
           </div>
+
+          {/* If additional related episodes match this story's tags/location */}
+          {otherRelatedPodcasts.length > 0 && (
+            <div className="pt-4 border-t border-white/10 space-y-3">
+              <h4 className="text-xs font-mono uppercase text-[#94A9C4] font-semibold">
+                Additional Recommended Audio for this Journey:
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {otherRelatedPodcasts.map((ep) => (
+                  <div
+                    key={ep.id}
+                    className="p-3 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 transition-colors flex items-center justify-between gap-3"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-bold text-white truncate">{ep.title}</p>
+                      <p className="text-[11px] text-[#94A9C4]">{ep.duration} · {ep.locationName}</p>
+                    </div>
+                    <button
+                      onClick={() => playEpisode(ep, true)}
+                      className="p-2 bg-[#2B6E70] hover:bg-[#225C5E] text-white rounded-lg transition-colors cursor-pointer shrink-0"
+                      title="Play episode"
+                    >
+                      <Play className="w-3.5 h-3.5 fill-current" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </section>
       )}
 
@@ -325,7 +418,7 @@ export const BlogArticlePage: React.FC<BlogArticlePageProps> = ({ slug, onNaviga
           </h3>
           <button
             onClick={() => onNavigate('blog')}
-            className="text-xs font-semibold text-[#2B6E70] dark:text-[#39888B] hover:text-[#E06D3B] transition-colors"
+            className="text-xs font-semibold text-[#2B6E70] dark:text-[#39888B] hover:text-[#E06D3B] transition-colors cursor-pointer"
           >
             View all stories →
           </button>

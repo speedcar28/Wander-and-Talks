@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
 import { AudioProvider } from './context/AudioContext';
+import { AuthProvider } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { StickyMiniPlayer } from './components/StickyMiniPlayer';
+import { AuthModal } from './components/AuthModal';
 
 import { HomePage } from './pages/HomePage';
 import { BlogPage } from './pages/BlogPage';
@@ -13,6 +15,7 @@ import { DestinationDetailPage } from './pages/DestinationDetailPage';
 import { PodcastPage } from './pages/PodcastPage';
 import { AboutPage } from './pages/AboutPage';
 import { ContactPage } from './pages/ContactPage';
+import { ProfilePage } from './pages/ProfilePage';
 
 export function AppContent() {
   const [currentPath, setCurrentPath] = useState<string>(() => {
@@ -63,6 +66,8 @@ export function AppContent() {
         return <AboutPage onNavigate={navigateTo} />;
       case 'contact':
         return <ContactPage onNavigate={navigateTo} />;
+      case 'profile':
+        return <ProfilePage onNavigate={navigateTo} />;
       case 'home':
       default:
         return <HomePage onNavigate={navigateTo} />;
@@ -82,6 +87,9 @@ export function AppContent() {
       {/* Persistent Sticky Mini Player Dock */}
       <StickyMiniPlayer onOpenPodcastPage={() => navigateTo('podcast')} />
 
+      {/* Global Auth / Profile Modal */}
+      <AuthModal onNavigateToProfile={() => navigateTo('profile')} />
+
       {/* Footer */}
       <Footer onNavigate={navigateTo} />
     </div>
@@ -91,9 +99,11 @@ export function AppContent() {
 export default function App() {
   return (
     <ThemeProvider>
-      <AudioProvider>
-        <AppContent />
-      </AudioProvider>
+      <AuthProvider>
+        <AudioProvider>
+          <AppContent />
+        </AudioProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

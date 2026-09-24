@@ -72,6 +72,17 @@ export interface PodcastEpisode {
   fileSizeMb?: number;
 }
 
+export interface DestinationMapMarker {
+  id: string;
+  name: string;
+  description: string;
+  category: 'Sight' | 'Nature' | 'Food' | 'History' | 'Audio Spot';
+  lat: number;
+  lng: number;
+  blogSlug?: string;
+  episodeId?: string;
+}
+
 export interface Destination {
   id: string;
   slug: string;
@@ -93,6 +104,18 @@ export interface Destination {
   highlights: string[];
   relatedBlogSlugs: string[];
   relatedEpisodeIds: string[];
+  mapMarkers?: DestinationMapMarker[];
+}
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  joinedDate: string;
+  favoriteBlogSlugs: string[];
+  subscribedPodcastIds: string[];
+  newsletterSubscribed: boolean;
 }
 
 export interface GearItem {

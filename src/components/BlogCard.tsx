@@ -1,6 +1,7 @@
 import React from 'react';
-import { Clock, MapPin, ArrowRight } from 'lucide-react';
+import { Clock, MapPin, ArrowRight, Bookmark } from 'lucide-react';
 import { BlogArticle } from '../types';
+import { useAuth } from '../context/AuthContext';
 
 interface BlogCardProps {
   article: BlogArticle;
@@ -9,6 +10,14 @@ interface BlogCardProps {
 }
 
 export const BlogCard: React.FC<BlogCardProps> = ({ article, onSelect, featured = false }) => {
+  const { isFavorite, toggleFavorite } = useAuth();
+  const isSaved = isFavorite(article.slug);
+
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleFavorite(article.slug);
+  };
+
   return (
     <article
       onClick={() => onSelect(article.slug)}
@@ -36,6 +45,20 @@ export const BlogCard: React.FC<BlogCardProps> = ({ article, onSelect, featured 
         <div className="absolute top-3 left-3 bg-[#0F1B2B]/80 backdrop-blur-xs text-white text-[11px] font-mono tracking-wider uppercase px-2.5 py-1 rounded-sm">
           {article.category}
         </div>
+
+        {/* Bookmark Quick Action Button */}
+        <button
+          onClick={handleFavoriteClick}
+          aria-label={isSaved ? "Remove from bookmarks" : "Bookmark article"}
+          title={isSaved ? "Saved in bookmarks" : "Save article"}
+          className={`absolute top-3 right-3 p-1.5 rounded-lg backdrop-blur-md transition-all cursor-pointer ${
+            isSaved
+              ? 'bg-[#E06D3B] text-white shadow-sm'
+              : 'bg-black/40 text-white/80 hover:bg-black/70 hover:text-white'
+          }`}
+        >
+          <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-current' : ''}`} />
+        </button>
       </div>
 
       {/* Content Body */}

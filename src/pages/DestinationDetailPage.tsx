@@ -17,6 +17,7 @@ import { BLOG_ARTICLES } from '../data/blogs';
 import { PODCAST_EPISODES } from '../data/podcasts';
 import { BlogCard } from '../components/BlogCard';
 import { EpisodeCard } from '../components/EpisodeCard';
+import { InteractiveMap } from '../components/InteractiveMap';
 
 interface DestinationDetailPageProps {
   slug: string;
@@ -182,6 +183,12 @@ export const DestinationDetailPage: React.FC<DestinationDetailPageProps> = ({ sl
         </div>
 
       </div>
+
+      {/* Interactive Cartography Map Component */}
+      <InteractiveMap
+        destination={destination}
+        onNavigateToBlog={(blogSlug) => onNavigate(`blog-article-${blogSlug}`)}
+      />
 
       {/* Related Blog Posts */}
       {relatedArticles.length > 0 && (

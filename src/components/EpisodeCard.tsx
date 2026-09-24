@@ -1,7 +1,8 @@
 import React from 'react';
-import { Play, Pause, Clock, Calendar, MapPin, Volume2 } from 'lucide-react';
+import { Play, Pause, Clock, Calendar, MapPin, Volume2, Bookmark } from 'lucide-react';
 import { PodcastEpisode } from '../types';
 import { useAudio } from '../context/AudioContext';
+import { useAuth } from '../context/AuthContext';
 
 interface EpisodeCardProps {
   episode: PodcastEpisode;
@@ -10,8 +11,11 @@ interface EpisodeCardProps {
 
 export const EpisodeCard: React.FC<EpisodeCardProps> = ({ episode, onSelectBlog }) => {
   const { currentEpisode, isPlaying, playEpisode, togglePlay } = useAudio();
+  const { isSubscribed, toggleSubscription } = useAuth();
+  
   const isThisEpisodeActive = currentEpisode?.id === episode.id;
   const isThisEpisodePlaying = isThisEpisodeActive && isPlaying;
+  const isSaved = isSubscribed(episode.id);
 
   const handlePlayClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -20,6 +24,11 @@ export const EpisodeCard: React.FC<EpisodeCardProps> = ({ episode, onSelectBlog 
     } else {
       playEpisode(episode, true);
     }
+  };
+
+  const handleSubscribeClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleSubscription(episode.id);
   };
 
   return (
@@ -115,10 +124,24 @@ export const EpisodeCard: React.FC<EpisodeCardProps> = ({ episode, onSelectBlog 
       </div>
 
       {/* Right Action Button */}
-      <div className="hidden lg:flex flex-col items-end justify-center shrink-0 pl-4">
+      <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 shrink-0 sm:pl-4 pt-3 sm:pt-0 border-t sm:border-t-0 border-[#EAE3D2] dark:border-[#223347] w-full sm:w-auto">
+        <button
+          onClick={handleSubscribeClick}
+          aria-label={isSaved ? "Saved to playlist" : "Save episode to playlist"}
+          title={isSaved ? "Saved in your list" : "Save episode"}
+          className={`p-2 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 border ${
+            isSaved
+              ? 'bg-[#E06D3B]/10 border-[#E06D3B] text-[#E06D3B]'
+              : 'border-[#EAE3D2] dark:border-[#223347] text-[#6B85A6] hover:text-[#0F1B2B] dark:hover:text-white'
+          }`}
+        >
+          <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-current' : ''}`} />
+          <span className="sm:hidden">{isSaved ? 'Saved' : 'Save'}</span>
+        </button>
+
         <button
           onClick={handlePlayClick}
-          className={`flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg transition-all ${
+          className={`flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
             isThisEpisodePlaying
               ? 'bg-[#E06D3B] text-white shadow-sm'
               : 'bg-[#F4EFE6] dark:bg-[#18283E] text-[#0F1B2B] dark:text-white hover:bg-[#EAE3D2] dark:hover:bg-[#243954]'
